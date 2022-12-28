@@ -1048,6 +1048,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
                         if(!(count_x+count_y*texWidth>=pixels_new.length)){
                             pixel = pixels_new[count_x+count_y*texWidth];
                         }
+                        //coment
                         if(side==0){
                             paint.setColor(pixel);
                         }else{
