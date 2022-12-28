@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Online strike</string>
+    <string name="send">SEND</string>
+    <string name="start_game">START GAME</string>
+    <string name="go_to_chat">GO TO CHAT</string>
+    <string name="password">Email</string>
+    <string name="sign_up">SIGN UP</string>
+    <string name="sign_in">SIGN IN</string>
+</resources>
