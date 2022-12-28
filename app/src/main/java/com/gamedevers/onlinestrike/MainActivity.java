@@ -12,6 +12,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.media.AudioManager;
+import android.media.Image;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Build;
@@ -42,8 +43,10 @@ import java.util.concurrent.TimeUnit;
 public class MainActivity extends AppCompatActivity implements GestureDetector.OnGestureListener {
 
     private Bitmap texture;
+    private Bitmap texture_src;
     private Bitmap enemy_texture;
-    private final int resolution = 2;
+    private Bitmap enemy_texture_src;
+    private final int resolution =6;
     private static final SoundPool sp = new SoundPool(30, AudioManager.STREAM_MUSIC, 0);
     private static int FireSound;
     private static int OppFireSound;
@@ -80,7 +83,9 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         texture = BitmapFactory.decodeResource(this.getResources(), R.mipmap.texture);
+        texture_src = BitmapFactory.decodeResource(this.getResources(), R.mipmap.texture);
         enemy_texture = BitmapFactory.decodeResource(this.getResources(), R.mipmap.enemy_texture);
+        enemy_texture_src = BitmapFactory.decodeResource(this.getResources(), R.mipmap.enemy_texture);
         FireSound = sp.load(this,R.raw.firesound,1);
         OppFireSound = sp.load(this,R.raw.oppfiresound,1);
         maxPlayers = 500;
@@ -301,14 +306,14 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
 
     static ArrayList<String> map = new ArrayList<>();
     static ArrayList<Integer> lights = new ArrayList<>();
-    static int texWidth = 64;
+    static int texWidth = 24;
     static int texHeight = 64;
     static float rotSpeed = 0.1f;
     static double px = 11.0;
     static double py = 11.5;  //x and y start position
     static double angleX = -1.0;
     static int angle = (int) angleX;
-    static double angleY = 0.0; //initial direction vector
+    static double angleY = 0; //initial direction vector
     static double planeX = 0.0;
     static double planeY = 0.66; //the 2d raycaster version of camera plane
 
@@ -869,11 +874,11 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         public int[] createBitmap(int lineHeight,int texNum){
             int[] pixels_new;
             if(texNum==1){
-                texture = Bitmap.createScaledBitmap(texture,texWidth,lineHeight/resolution,false);
+                texture = Bitmap.createScaledBitmap(texture_src,texWidth,lineHeight/resolution,false);
                 pixels_new = new int[texture.getHeight()* texture.getWidth()];
                 texture.getPixels(pixels_new,0,texture.getWidth(),0,0,texture.getWidth(),texture.getHeight());
             }else {
-                enemy_texture = Bitmap.createScaledBitmap(enemy_texture,texWidth,(lineHeight/resolution)-5,false);
+                enemy_texture = Bitmap.createScaledBitmap(enemy_texture_src,texWidth,(lineHeight/resolution)-5,false);
                 pixels_new = new int[enemy_texture.getHeight()* enemy_texture.getWidth()];
                 enemy_texture.getPixels(pixels_new,0,enemy_texture.getWidth(),0,0,enemy_texture.getWidth(),enemy_texture.getHeight());
             }
@@ -1043,7 +1048,11 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
                         if(!(count_x+count_y*texWidth>=pixels_new.length)){
                             pixel = pixels_new[count_x+count_y*texWidth];
                         }
-                        paint.setColor(pixel);
+                        if(side==0){
+                            paint.setColor(pixel);
+                        }else{
+                            paint.setColor(pixel+25);
+                        }
                     }else {
                         paint.setColor(Color.DKGRAY);
                     }
