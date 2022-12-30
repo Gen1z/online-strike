@@ -12,7 +12,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.media.AudioManager;
-import android.media.Image;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Build;
@@ -44,10 +43,12 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
 
     private Bitmap texture;
     private Bitmap texture_src;
+    private Bitmap dor_texture;
+    private Bitmap dor_texture_src;
     private Bitmap enemy_texture;
     private Bitmap enemy_texture_src;
-    private final int resolution =6;
-    private static final SoundPool sp = new SoundPool(30, AudioManager.STREAM_MUSIC, 0);
+    private final int resolution =5;
+    private static final SoundPool sp = new SoundPool(30, AudioManager.STREAM_MUSIC, 100);
     private static int FireSound;
     private static int OppFireSound;
     private static boolean walk = false;
@@ -62,8 +63,8 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
     static int width;
     static int height;
     static String encode;
-    public static DatabaseReference myAdress;
-    public static ArrayList<DatabaseReference> OppAdress = new ArrayList<>();
+    public static DatabaseReference myAddress;
+    public static ArrayList<DatabaseReference> OppAddress = new ArrayList<>();
     public static ArrayList<String> codes = new ArrayList<>();
     private static int myPlayer = 0;
     private GestureDetectorCompat gd;
@@ -84,6 +85,8 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
     protected void onCreate(Bundle savedInstanceState) {
         texture = BitmapFactory.decodeResource(this.getResources(), R.mipmap.texture);
         texture_src = BitmapFactory.decodeResource(this.getResources(), R.mipmap.texture);
+        dor_texture = BitmapFactory.decodeResource(this.getResources(),R.mipmap.dor_texture);
+        dor_texture_src = BitmapFactory.decodeResource(this.getResources(),R.mipmap.dor_texture);
         enemy_texture = BitmapFactory.decodeResource(this.getResources(), R.mipmap.enemy_texture);
         enemy_texture_src = BitmapFactory.decodeResource(this.getResources(), R.mipmap.enemy_texture);
         FireSound = sp.load(this,R.raw.firesound,1);
@@ -221,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        myAdress.setValue("");
+        myAddress.setValue("");
     }
 
     public void onClickStart(View view) throws InterruptedException {
@@ -251,14 +254,14 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
             myPlayer = p;
         }
         //
-        myAdress = database.getReference("P"+String.valueOf(myPlayer));
+        myAddress = database.getReference("P"+String.valueOf(myPlayer));
         int i = 0;
-        OppAdress.clear();
+        OppAddress.clear();
         while(!(i>=maxPlayers)){
-            if(!(("P" + i).equals(String.valueOf(myAdress)))){
-                OppAdress.add(database.getReference("P"+ i));
+            if(!(("P" + i).equals(String.valueOf(myAddress)))){
+                OppAddress.add(database.getReference("P"+ i));
                 int finalI1 = i;
-                OppAdress.get(OppAdress.size()-1).addValueEventListener(new ValueEventListener() {
+                OppAddress.get(OppAddress.size()-1).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         infFromOpp.set(finalI1,snapshot.getValue(String.class));
@@ -270,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
                         saveData(String.valueOf(false));
                         saveData(String.valueOf(false));
                         saveData(String.valueOf(healt));
-                        myAdress.setValue(encode);
+                        myAddress.setValue(encode);
                         if(healt<=0){
                             Intent i = new Intent(MainActivity.this, MainActivity.class);
                             startActivity(i);
@@ -307,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
     static ArrayList<String> map = new ArrayList<>();
     static ArrayList<Integer> lights = new ArrayList<>();
     static int texWidth = 24;
-    static int texHeight = 64;
+    static int texHeight = 86;
     static float rotSpeed = 0.1f;
     static double px = 11.0;
     static double py = 11.5;  //x and y start position
@@ -319,7 +322,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
 
     public static void setUp2Dmap(){
         //
-        map.add("11111111111111111111111111111111");
+        map.add("11111111111111112111111111111111");
         map.add("10000000000000000000000000000001");
         map.add("10000000000000000000000000000001");
         map.add("10000000000000000000000000000001");
@@ -654,8 +657,8 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
                 if (motionEvent.getY() > height / 4 && motionEvent.getY() < (height / 4) + 100) {
                     mdShagi.start();
                     walk = true;
-                    py += 1 * Math.sin(angleX);
-                    px += 1 * Math.cos(angleY);
+                    py += 1 * angleX;
+                    px += 1 * angleY;
                 } else {
                     walk = false;
                 }
@@ -664,8 +667,8 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
                 if (motionEvent.getY() > (height / 4) + 120 && motionEvent.getY() < (height / 4) + 220) {
                     mdShagi.start();
                     walk = true;
-                    py -= 1 * Math.sin(angleX);
-                    px -= 1 * Math.cos(angleY);
+                    py -= 1 * angleX;
+                    px -= 1 * angleY;
                 } else {
                     if(!walk){
                         walk = false;
@@ -695,7 +698,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
             saveData(String.valueOf(fire));
             saveData(String.valueOf(walk));
             saveData(String.valueOf(healt));
-            myAdress.setValue(encode);
+            myAddress.setValue(encode);
             if(fire){
                 try {
                     TimeUnit.MILLISECONDS.sleep(30);
@@ -709,7 +712,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
                 saveData(String.valueOf(false));
                 saveData(String.valueOf(false));
                 saveData(String.valueOf(healt));
-                myAdress.setValue(encode);
+                myAddress.setValue(encode);
             }
             if(walk){
                 try {
@@ -724,7 +727,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
                 saveData(String.valueOf(false));
                 saveData(String.valueOf(false));
                 saveData(String.valueOf(healt));
-                myAdress.setValue(encode);
+                myAddress.setValue(encode);
             }
             setContentView(new RaycastDraw(this));
             // Текущее время
@@ -838,7 +841,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
             saveData(String.valueOf(fire));
             saveData(String.valueOf(walk));
             saveData(String.valueOf(healt));
-            myAdress.setValue(encode);
+            myAddress.setValue(encode);
             setContentView(new RaycastDraw(this));
             // Текущее время
             Date currentDate = new Date();
@@ -872,13 +875,17 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         }
 
         public int[] createBitmap(int lineHeight,int texNum){
-            int[] pixels_new;
+            int[] pixels_new = new int[0];
             if(texNum==1){
                 texture = Bitmap.createScaledBitmap(texture_src,texWidth,lineHeight/resolution,false);
                 pixels_new = new int[texture.getHeight()* texture.getWidth()];
                 texture.getPixels(pixels_new,0,texture.getWidth(),0,0,texture.getWidth(),texture.getHeight());
-            }else {
-                enemy_texture = Bitmap.createScaledBitmap(enemy_texture_src,texWidth,(lineHeight/resolution)-5,false);
+            }else if(texNum==2){
+                dor_texture = Bitmap.createScaledBitmap(dor_texture_src,texWidth,(lineHeight/resolution),false);
+                pixels_new = new int[dor_texture.getHeight()* dor_texture.getWidth()];
+                dor_texture.getPixels(pixels_new,0,dor_texture.getWidth(),0,0,dor_texture.getWidth(),dor_texture.getHeight());
+            }else if(texNum==3){
+                enemy_texture = Bitmap.createScaledBitmap(enemy_texture_src,texWidth,(lineHeight/resolution),false);
                 pixels_new = new int[enemy_texture.getHeight()* enemy_texture.getWidth()];
                 enemy_texture.getPixels(pixels_new,0,enemy_texture.getWidth(),0,0,enemy_texture.getWidth(),enemy_texture.getHeight());
             }
@@ -889,7 +896,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         protected void onDraw(Canvas canvas){
             super.onDraw(canvas);
             ArrayList<Integer> list = new ArrayList<>();
-            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            Paint paint = new Paint();
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(Color.BLACK);
             canvas.drawPaint(paint);
@@ -899,7 +906,6 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
             int old_dist = 0;
             int count_x = 0;
             int y=0,stop_y=0;
-            int old_mapX,old_mapY;
             int[] pixels_new = new int[0];
             for(int x = 0; x < width*1.075; x+=resolution) {
                 if(x!=0){
@@ -950,12 +956,10 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
                     //jump to next map square, either in x-direction, or in y-direction
                     if (sideDistX < sideDistY) {
                         sideDistX += deltaDistX;
-                        old_mapX=mapX;
                         mapX += stepX;
                         side = 0;
                     } else {
                         sideDistY += deltaDistY;
-                        old_mapY=mapY;
                         mapY += stepY;
                         side = 1;
                     }
@@ -1035,6 +1039,9 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
                         if(lights.get(x)==3&&lights.get(x-1)!=3) {
                             count_x = 0;
                         }
+                        if(lights.get(x)==2&&lights.get(x-1)!=2) {
+                            count_x = 0;
+                        }
                     }
                 }
                 stop_y  = (lineHeight/2)+300;
@@ -1048,7 +1055,6 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
                         if(!(count_x+count_y*texWidth>=pixels_new.length)){
                             pixel = pixels_new[count_x+count_y*texWidth];
                         }
-                        //coment
                         if(side==0){
                             paint.setColor(pixel);
                         }else{
